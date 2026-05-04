@@ -1,36 +1,44 @@
-// src/greeting.js
-"use strict";
+using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-/**
- * Validiert und formatiert den Nutzernamen.
- * Erlaubt alphanumerische Zeichen, Leerzeichen, Binde- und Unterstriche.
- * Maximale Länge: 50 Zeichen.
- *
- * @param  {string} username
- * @returns {string} Der bereinigte Nutzername
- * @throws {Error} Wenn der Nutzername ungültig ist
- */
-function greeting(username) {
-  if (typeof username !== "string") {
-    throw new TypeError("Nutzername muss ein String sein.");
-  }
+namespace HelloWorldApp.Generated
+{
+    /// <summary>
+    /// Behandelt die Begrüßungslogik für den Nutzer.
+    /// </summary>
+    public static class GreetingHandler
+    {
+        private static readonly Regex ValidUsernamePattern = new("^[a-zA-Z0-9 _-]+$", RegexOptions.Compiled);
+        private const int MaxUsernameLength = 50;
 
-  const trimmed = username.trim();
-  if (!trimmed) {
-    throw new Error("Nutzername darf nicht leer sein.");
-  }
+        /// <summary>
+        /// Validiert und formatiert den Nutzernamen.
+        /// Erlaubt alphanumerische Zeichen, Leerzeichen, Binde- und Unterstriche.
+        /// Maximale Länge: 50 Zeichen.
+        /// </summary>
+        /// <param name="username">Der zu validierende und formatierende Nutzername</param>
+        /// <returns>Die formatierte Begrüßungsnachricht</returns>
+        /// <exception cref="ArgumentNullException">Wenn der Nutzername null ist</exception>
+        /// <exception cref="ArgumentException">Wenn der Nutzername ungültig ist</exception>
+        public static string ProcessGreeting(string username)
+        {
+            if (username is null)
+                throw new ArgumentNullException(nameof(username), "Nutzername darf nicht null sein.");
 
-  if (trimmed.length > 50) {
-    throw new RangeError("Nutzername darf höchstens 50 Zeichen lang sein.");
-  }
+            var trimmed = username.Trim();
 
-  const isValid = /^[a-zA-Z0-9 _-]+$/.test(trimmed);
-  if (!isValid) {
-    throw new RangeError("Nutzername enthält ungültige Zeichen.");
-  }
+            if (string.IsNullOrEmpty(trimmed))
+                throw new ArgumentException("Nutzername darf nicht leer sein.", nameof(username));
 
-  // Erstes Zeichen groß, Rest so belassen
-  return `Hallo ${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}! Willkommen bei Hello-World.`;
+            if (trimmed.Length > MaxUsernameLength)
+                throw new ArgumentException($"Nutzername darf höchstens {MaxUsernameLength} Zeichen lang sein.", nameof(username));
+
+            if (!ValidUsernamePattern.IsMatch(trimmed))
+                throw new ArgumentException("Nutzername enthält ungültige Zeichen.", nameof(username));
+
+            var formattedName = char.ToUpper(trimmed[0]) + trimmed[1..];
+            return $"Hallo {formattedName}! Willkommen bei Hello-World.";
+        }
+    }
 }
-
-module.exports = { greeting };
